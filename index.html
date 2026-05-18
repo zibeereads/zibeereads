@@ -3,14 +3,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EW1K752XFR"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-EW1K752XFR');
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
 <title>Zi-Bee Reads</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
@@ -1195,20 +1187,15 @@ function submitOnboarding(){
   else{sessionStorage.setItem('zibee_profile',data);localStorage.removeItem('zibee_profile');}
   // Save to Supabase Signups table
   const ageMap={'5-8':7,'9-12':10,'13-17':15,'18+':20};
-  fetch('https://qixuqrjmxwcsyvriyjsz.supabase.co/rest/v1/Signups',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpeHVxcmpteHdjc3l2cml5anN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTEyMTQsImV4cCI6MjA5NDE2NzIxNH0.fysRmOQAhJIrQrlEUH8dndpBfcoYIInvU3XT4wclJ0g',
-      'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpeHVxcmpteHdjc3l2cml5anN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTEyMTQsImV4cCI6MjA5NDE2NzIxNH0.fysRmOQAhJIrQrlEUH8dndpBfcoYIInvU3XT4wclJ0g',
-      'Prefer':'return=representation',
-      'Content-Profile':'public'
-    },
-    body:JSON.stringify({name:name,email:email,age:ageMap[selectedAge]||18})
-  }).then(r=>{
-    if(!r.ok){r.text().then(t=>console.log('Signup error:',r.status,t));}
-    else{console.log('Signup saved ✓');}
-  }).catch(e=>console.log('Signup catch:',e.message));
+  const xhr2=new XMLHttpRequest();
+  xhr2.open('POST','https://qixuqrjmxwcsyvriyjsz.supabase.co/rest/v1/Signups',true);
+  xhr2.setRequestHeader('Content-Type','application/json');
+  xhr2.setRequestHeader('apikey','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpeHVxcmpteHdjc3l2cml5anN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTEyMTQsImV4cCI6MjA5NDE2NzIxNH0.fysRmOQAhJIrQrlEUH8dndpBfcoYIInvU3XT4wclJ0g');
+  xhr2.setRequestHeader('Authorization','Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpeHVxcmpteHdjc3l2cml5anN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTEyMTQsImV4cCI6MjA5NDE2NzIxNH0.fysRmOQAhJIrQrlEUH8dndpBfcoYIInvU3XT4wclJ0g');
+  xhr2.setRequestHeader('Prefer','return=minimal');
+  xhr2.onload=function(){console.log('Signup:',xhr2.status,xhr2.responseText);};
+  xhr2.onerror=function(){console.log('Signup error:',xhr2.status);};
+  xhr2.send(JSON.stringify({name:name,email:email,age:ageMap[selectedAge]||18}));
   document.getElementById('onboarding').classList.add('hidden');
   document.getElementById('app').style.display='block';
   initApp();
