@@ -249,6 +249,32 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
 .contact-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid rgba(245,158,11,0.2);background:rgba(245,158,11,0.06);margin-top:10px;}
 .contact-row a{color:#F5A800;font-size:14px;font-weight:700;text-decoration:none;}
 .contact-row a:hover{text-decoration:underline;}
+
+/* ── AUTH ── */
+.auth-tabs{display:flex;background:rgba(255,255,255,0.06);border-radius:14px;padding:4px;margin-bottom:24px;}
+.auth-tab{flex:1;padding:10px;border:none;background:none;color:rgba(255,255,255,0.45);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;border-radius:10px;cursor:pointer;transition:all .2s;}
+.auth-tab.active{background:#f59e0b;color:#1c0a00;}
+.auth-msg{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700;margin-bottom:14px;display:none;}
+.auth-msg.error{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);}
+.auth-msg.success{background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3);}
+.ob-input-wrap{position:relative;margin-bottom:14px;}
+.ob-input-wrap .ob-input{margin-bottom:0;padding-right:44px;}
+.ob-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.45);cursor:pointer;font-size:16px;padding:4px;}
+/* ── PROFILE ── */
+.profile-hero{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(217,119,6,.07));border:1px solid rgba(245,158,11,.25);border-radius:20px;padding:28px;text-align:center;margin-bottom:20px;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#1c0a00;margin:0 auto 14px;border:3px solid rgba(245,158,11,0.4);}
+.profile-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#F5A800;margin-bottom:4px;}
+.profile-sub{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:4px;}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.ps{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;}
+.ps-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#f59e0b;}
+.ps-lbl{font-size:11px;color:rgba(255,255,255,0.45);font-weight:700;margin-top:2px;}
+.badge-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+.badge-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);min-width:80px;}
+.badge-item.earned{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.1);color:#f59e0b;}
+.badge-item .bi{font-size:22px;display:block;margin-bottom:4px;}
+.signout-btn{width:100%;padding:14px;border-radius:50px;background:rgba(248,113,113,0.12);border:1.5px solid rgba(248,113,113,0.3);color:#f87171;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:16px;}
+.signout-btn:hover{background:rgba(248,113,113,0.2);}
 </style>
 
 </head>
@@ -311,36 +337,56 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
         </svg>
       </div>
       <h1 class="ob-title" id="ob-title">Welcome to Zi-Bee Reads!</h1>
-      <p class="ob-sub" id="ob-sub">Tell us a little about yourself so we can personalise your experience.</p>
+      <p class="ob-sub" id="ob-sub">Your personal reading companion. Sign up or log in to get started.</p>
     </div>
-    <div class="ob-form">
-      <label class="ob-label" id="ob-name-lbl">Your Name</label>
-      <input class="ob-input" id="ob-name" type="text" placeholder="e.g. Amara" maxlength="40"/>
-      <p id="ob-name-err" style="color:#f87171;font-size:12px;margin-top:-10px;margin-bottom:10px;display:none;">Please enter your name</p>
 
-```
-  <label class="ob-label" id="ob-age-lbl">Age Group</label>
-  <div class="age-grid" id="ageGrid">
-    <div class="age-chip" onclick="pickAge(this,'5-8')">Kids<span>Ages 5–8</span></div>
-    <div class="age-chip" onclick="pickAge(this,'9-12')">Tweens<span>Ages 9–12</span></div>
-    <div class="age-chip selected" onclick="pickAge(this,'13-17')">Teens<span>Ages 13–17</span></div>
-    <div class="age-chip" onclick="pickAge(this,'18+')">Adults<span>18+</span></div>
-  </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('signup')" id="auth-tab-signup">Sign Up</button>
+      <button class="auth-tab" onclick="switchAuth('login')" id="auth-tab-login">Log In</button>
+    </div>
 
-  <label class="ob-label" id="ob-email-lbl">Email Address</label>
-  <input class="ob-input" id="ob-email" type="email" placeholder="e.g. amara@email.com"/>
-  <p id="ob-email-err" style="color:#f87171;font-size:12px;margin-top:-10px;margin-bottom:10px;display:none;">Please enter a valid email</p>
+    <div class="auth-msg" id="auth-msg"></div>
 
-  <label class="ob-check" onclick="toggleRemember()">
-    <div class="ob-checkbox on" id="rememberBox">✓</div>
-    <div class="ob-check-txt" id="ob-remember-txt">Remember me on this device<small id="ob-remember-sub">You won't need to sign in again on this device</small></div>
-  </label>
+    <!-- SIGN UP -->
+    <div id="auth-signup-form" class="ob-form">
+      <label class="ob-label">Your Name</label>
+      <input class="ob-input" id="su-name" type="text" placeholder="e.g. Amara" maxlength="40"/>
 
-  <button class="ob-btn" id="ob-submit-btn" onclick="submitOnboarding()">Let's Read! 📚</button>
-  <p class="ob-privacy" id="ob-privacy">Your info stays on this device only. We never share it.</p>
-</div>
-```
+      <label class="ob-label">Age Group</label>
+      <div class="age-grid" id="ageGrid">
+        <div class="age-chip" onclick="pickAge(this,'5-8')">Kids<span>Ages 5–8</span></div>
+        <div class="age-chip" onclick="pickAge(this,'9-12')">Tweens<span>Ages 9–12</span></div>
+        <div class="age-chip selected" onclick="pickAge(this,'13-17')">Teens<span>Ages 13–17</span></div>
+        <div class="age-chip" onclick="pickAge(this,'18+')">Adults<span>18+</span></div>
+      </div>
 
+      <label class="ob-label">Email Address</label>
+      <input class="ob-input" id="su-email" type="email" placeholder="e.g. amara@email.com"/>
+
+      <label class="ob-label">Password</label>
+      <div class="ob-input-wrap">
+        <input class="ob-input" id="su-password" type="password" placeholder="Min 6 characters"/>
+        <button class="ob-eye" onclick="togglePwd('su-password',this)">👁</button>
+      </div>
+
+      <button class="ob-btn" onclick="doSignUp()">Create Account 📚</button>
+      <p class="ob-privacy">By signing up you agree to our Privacy Policy and Terms of Use.</p>
+    </div>
+
+    <!-- LOG IN -->
+    <div id="auth-login-form" class="ob-form" style="display:none;">
+      <label class="ob-label">Email Address</label>
+      <input class="ob-input" id="li-email" type="email" placeholder="e.g. amara@email.com"/>
+
+      <label class="ob-label">Password</label>
+      <div class="ob-input-wrap">
+        <input class="ob-input" id="li-password" type="password" placeholder="Your password"/>
+        <button class="ob-eye" onclick="togglePwd('li-password',this)">👁</button>
+      </div>
+
+      <button class="ob-btn" onclick="doLogin()">Log In 📚</button>
+      <span style="color:#f59e0b;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-align:center;display:block;margin-top:12px;" onclick="switchAuth('signup')">Don't have an account? Sign up</span>
+    </div>
   </div>
 </div>
 
@@ -366,6 +412,8 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
     <button class="drawer-btn" onclick="showFromDrawer('quiz')" id="drawer-quiz"><span class="icon">🎯</span> Quiz</button>
     <button class="drawer-btn" onclick="showFromDrawer('picks')" id="drawer-picks"><span class="icon"><img src="https://res.cloudinary.com/dhudiirqu/image/upload/f_auto,q_auto/F014A545-DA73-4AC6-BAD6-FE44AB603A53_q4bvhx" width="18" height="18" style="border-radius:3px;vertical-align:middle;"/></span> Zi-Bee Picks</button>
     <button class="drawer-btn" onclick="showFromDrawer('challenge')" id="drawer-challenge"><span class="icon">🏆</span> Challenge</button>
+    <div class="drawer-divider"></div>
+    <button class="drawer-btn" onclick="showFromDrawer('profile')" id="drawer-profile"><span class="icon">👤</span> My Profile</button>
     <div class="drawer-divider"></div>
     <button class="drawer-btn" onclick="showFromDrawer('about')" id="drawer-about"><span class="icon">💛</span> About Us</button>
     <button class="drawer-btn" onclick="showFromDrawer('privacy')" id="drawer-privacy"><span class="icon">🔒</span> Privacy Policy</button>
@@ -759,6 +807,46 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
 ```
 
   </div>
+</div>
+
+
+<!-- PROFILE -->
+<div class="screen" id="screen-profile">
+  <div class="profile-hero">
+    <div class="profile-avatar" id="profile-avatar">📖</div>
+    <div class="profile-name" id="profile-name">Reader</div>
+    <div class="profile-sub" id="profile-email-display"></div>
+    <div class="profile-sub" id="profile-age-display"></div>
+  </div>
+
+  <div class="profile-stats">
+    <div class="ps"><div class="ps-num" id="pr-total">0</div><div class="ps-lbl">Books Added</div></div>
+    <div class="ps"><div class="ps-num" id="pr-done" style="color:#34d399;">0</div><div class="ps-lbl">Finished</div></div>
+    <div class="ps"><div class="ps-num" id="pr-days">0</div><div class="ps-lbl">Reading Days</div></div>
+  </div>
+
+  <div class="about-section" style="margin-bottom:16px;">
+    <h3>🏅 My Badges</h3>
+    <div class="badge-row">
+      <div class="badge-item" id="badge-7"><span class="bi">⭐</span>Early Reader</div>
+      <div class="badge-item" id="badge-15"><span class="bi">🌟</span>Bookworm</div>
+      <div class="badge-item" id="badge-30"><span class="bi">🏆</span>30-Day Champ</div>
+    </div>
+  </div>
+
+  <div class="about-section" style="margin-bottom:16px;">
+    <h3>⚙️ Account</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;color:rgba(255,255,255,0.45);">Member since</span>
+      <span style="font-size:14px;font-weight:700;" id="profile-joined">—</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;">
+      <span style="font-size:14px;color:rgba(255,255,255,0.45);">Age group</span>
+      <span style="font-size:14px;font-weight:700;" id="profile-age-label">—</span>
+    </div>
+  </div>
+
+  <button class="signout-btn" onclick="doSignOut()">Sign Out</button>
 </div>
 
 </div><!-- end #app -->
@@ -1252,7 +1340,7 @@ function showFromDrawer(id){
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
-  const tabs=['home','rec','tracker','quiz','picks','challenge','about','privacy','terms'];
+  const tabs=['home','rec','tracker','quiz','picks','challenge','about','privacy','terms','profile'];
   tabs.forEach(t=>{
     const el=document.getElementById('tab-'+t);
     if(el)el.classList.remove('active');
@@ -1264,6 +1352,7 @@ function show(id){
   const activeDrawer=document.getElementById('drawer-'+id);
   if(activeDrawer)activeDrawer.classList.add('active');
   if(id==='quiz')renderQuizStart();
+  if(id==='profile')renderProfile();
   if(id==='picks')renderPicks();
   if(id==='challenge')renderChallenge();
   if(id==='tracker')renderBooks();
@@ -1281,7 +1370,7 @@ function t(k){return T[lang]?.[k]??T.en[k]??k;}
 function applyTranslations(){
   const L=T[lang]||T.en;
   // nav tabs
-  const tabs=['home','rec','tracker','quiz','picks','challenge','about','privacy','terms'];
+  const tabs=['home','rec','tracker','quiz','picks','challenge','about','privacy','terms','profile'];
   tabs.forEach((id,i)=>{
     const btn=document.getElementById('tab-'+id);
     if(btn)btn.textContent=L.nav[i];
@@ -1608,6 +1697,134 @@ function toggleDay(d){
   renderChallenge();
 }
 
+
+// ── SUPABASE AUTH ─────────────────────────────────────────────────────────
+const SUPA_URL='https://qixuqrjmxwcsyvriyjsz.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpeHVxcmpteHdjc3l2cml5anN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTEyMTQsImV4cCI6MjA5NDE2NzIxNH0.fysRmOQAhJIrQrlEUH8dndpBfcoYIInvU3XT4wclJ0g';
+let authToken=null,authUser=null;
+
+function supaXHR(path,method,body,token){
+  return new Promise((resolve,reject)=>{
+    const x=new XMLHttpRequest();
+    x.open(method,SUPA_URL+path,true);
+    x.setRequestHeader('Content-Type','application/json');
+    x.setRequestHeader('apikey',SUPA_KEY);
+    if(token)x.setRequestHeader('Authorization','Bearer '+token);
+    x.onload=function(){
+      try{resolve({status:x.status,data:JSON.parse(x.responseText||'{}')});}
+      catch(e){resolve({status:x.status,data:{}});}
+    };
+    x.onerror=function(){reject(new Error('Network error'));};
+    x.send(body?JSON.stringify(body):null);
+  });
+}
+
+function switchAuth(tab){
+  document.getElementById('auth-signup-form').style.display=tab==='signup'?'block':'none';
+  document.getElementById('auth-login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('auth-tab-signup').classList.toggle('active',tab==='signup');
+  document.getElementById('auth-tab-login').classList.toggle('active',tab==='login');
+  showAuthMsg('','');
+}
+
+function showAuthMsg(msg,type){
+  const el=document.getElementById('auth-msg');
+  el.textContent=msg;
+  el.className='auth-msg '+type;
+  el.style.display=msg?'block':'none';
+}
+
+function togglePwd(id,btn){
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁':'🙈';
+}
+
+async function doSignUp(){
+  const name=document.getElementById('su-name').value.trim();
+  const email=document.getElementById('su-email').value.trim();
+  const password=document.getElementById('su-password').value;
+  if(!name){showAuthMsg('Please enter your name.','error');return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showAuthMsg('Please enter a valid email.','error');return;}
+  if(password.length<6){showAuthMsg('Password must be at least 6 characters.','error');return;}
+  showAuthMsg('Creating your account…','success');
+  try{
+    const r=await supaXHR('/auth/v1/signup','POST',{email,password,data:{name,age_group:selectedAge}});
+    if(r.status===200||r.status===201){
+      authToken=r.data.access_token;
+      authUser=r.data.user;
+      await supaXHR('/rest/v1/profiles','POST',{id:authUser.id,name,age_group:selectedAge,goal:5},authToken);
+      const userData={id:authUser.id,email,name,age_group:selectedAge,created_at:new Date().toISOString()};
+      localStorage.setItem('zibee_token',authToken);
+      localStorage.setItem('zibee_user',JSON.stringify(userData));
+      profile={name,email,ageGroup:selectedAge};
+      document.getElementById('onboarding').classList.add('hidden');
+      document.getElementById('app').style.display='block';
+      initApp();
+    }else{
+      showAuthMsg(r.data.error_description||r.data.msg||r.data.message||'Sign up failed. Please try again.','error');
+    }
+  }catch(e){showAuthMsg('Connection error. Please try again.','error');}
+}
+
+async function doLogin(){
+  const email=document.getElementById('li-email').value.trim();
+  const password=document.getElementById('li-password').value;
+  if(!email){showAuthMsg('Please enter your email.','error');return;}
+  if(!password){showAuthMsg('Please enter your password.','error');return;}
+  showAuthMsg('Logging in…','success');
+  try{
+    const r=await supaXHR('/auth/v1/token?grant_type=password','POST',{email,password});
+    if(r.status===200){
+      authToken=r.data.access_token;
+      authUser=r.data.user;
+      const pr=await supaXHR('/rest/v1/profiles?id=eq.'+authUser.id+'&select=*','GET',null,authToken);
+      const up=pr.data[0]||{};
+      const name=up.name||authUser.user_metadata?.name||email.split('@')[0];
+      const age_group=up.age_group||'18+';
+      const userData={id:authUser.id,email,name,age_group,created_at:authUser.created_at};
+      localStorage.setItem('zibee_token',authToken);
+      localStorage.setItem('zibee_user',JSON.stringify(userData));
+      profile={name,email,ageGroup:age_group};
+      document.getElementById('onboarding').classList.add('hidden');
+      document.getElementById('app').style.display='block';
+      initApp();
+    }else{
+      showAuthMsg(r.data.error_description||'Invalid email or password.','error');
+    }
+  }catch(e){showAuthMsg('Connection error. Please try again.','error');}
+}
+
+async function doSignOut(){
+  try{await supaXHR('/auth/v1/logout','POST',null,authToken);}catch(e){}
+  authToken=null;authUser=null;
+  localStorage.removeItem('zibee_token');
+  localStorage.removeItem('zibee_user');
+  localStorage.removeItem('zibee_profile');
+  document.getElementById('app').style.display='none';
+  document.getElementById('onboarding').classList.remove('hidden');
+  switchAuth('login');
+}
+
+function renderProfile(){
+  const u=JSON.parse(localStorage.getItem('zibee_user')||'{}');
+  if(!u.name)return;
+  document.getElementById('profile-name').textContent=u.name;
+  document.getElementById('profile-email-display').textContent=u.email||'';
+  document.getElementById('profile-age-display').textContent=u.age_group?'Age group: '+u.age_group:'';
+  document.getElementById('profile-age-label').textContent=u.age_group||'—';
+  if(u.created_at)document.getElementById('profile-joined').textContent=new Date(u.created_at).toLocaleDateString();
+  document.getElementById('profile-avatar').textContent=u.name.charAt(0).toUpperCase();
+  const bks=JSON.parse(localStorage.getItem('zibee_books')||'[]');
+  const chal=JSON.parse(localStorage.getItem('zibee_chal')||'[]');
+  document.getElementById('pr-total').textContent=bks.length;
+  document.getElementById('pr-done').textContent=bks.filter(b=>b.done).length;
+  document.getElementById('pr-days').textContent=chal.length;
+  if(chal.length>=7)document.getElementById('badge-7').classList.add('earned');
+  if(chal.length>=15)document.getElementById('badge-15').classList.add('earned');
+  if(chal.length>=30)document.getElementById('badge-30').classList.add('earned');
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────
 function initApp(){
   renderFeats();
@@ -1621,8 +1838,12 @@ function initApp(){
 
 // on load
 window.addEventListener('DOMContentLoaded',()=>{
-  profile=loadProfile();
-  if(profile){
+  const savedToken=localStorage.getItem('zibee_token');
+  const savedUser=localStorage.getItem('zibee_user');
+  if(savedToken&&savedUser){
+    authToken=savedToken;
+    const u=JSON.parse(savedUser);
+    profile={name:u.name,email:u.email,ageGroup:u.age_group};
     document.getElementById('onboarding').classList.add('hidden');
     document.getElementById('app').style.display='block';
     initApp();
