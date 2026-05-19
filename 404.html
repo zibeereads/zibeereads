@@ -4,7 +4,11 @@
 <script>
   const hash = window.location.hash;
   const search = window.location.search;
-  window.location.replace('/zibeereads/' + (hash || '') + (search || ''));
+  if(hash || search){
+    window.location.replace('/zibeereads/' + (search||'') + (hash||''));
+  } else {
+    window.location.replace('/zibeereads/');
+  }
 </script>
 </head>
 <body></body>
