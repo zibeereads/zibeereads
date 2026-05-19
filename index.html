@@ -275,6 +275,18 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
 .badge-item .bi{font-size:22px;display:block;margin-bottom:4px;}
 .signout-btn{width:100%;padding:14px;border-radius:50px;background:rgba(248,113,113,0.12);border:1.5px solid rgba(248,113,113,0.3);color:#f87171;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:16px;}
 .signout-btn:hover{background:rgba(248,113,113,0.2);}
+
+/* ── PASSWORD STRENGTH ── */
+.pwd-strength{height:4px;border-radius:10px;margin-top:6px;margin-bottom:14px;background:rgba(255,255,255,0.08);overflow:hidden;}
+.pwd-strength-fill{height:100%;border-radius:10px;transition:width .3s,background .3s;width:0%;}
+.pwd-label{font-size:11px;font-weight:700;margin-top:4px;margin-bottom:12px;display:block;}
+.forgot-link{color:rgba(245,158,11,0.7);font-size:12px;font-weight:700;cursor:pointer;text-align:right;display:block;margin-top:-8px;margin-bottom:14px;}
+.forgot-link:hover{color:#f59e0b;}
+/* ── VERIFY EMAIL SCREEN ── */
+.verify-wrap{text-align:center;padding:40px 20px;}
+.verify-icon{font-size:56px;margin-bottom:16px;}
+.verify-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:#F5A800;margin-bottom:10px;}
+.verify-sub{font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:24px;}
 </style>
 
 </head>
@@ -365,12 +377,14 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
 
       <label class="ob-label">Password</label>
       <div class="ob-input-wrap">
-        <input class="ob-input" id="su-password" type="password" placeholder="Min 6 characters"/>
+        <input class="ob-input" id="su-password" type="password" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
         <button class="ob-eye" onclick="togglePwd('su-password',this)">👁</button>
       </div>
+      <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill"></div></div>
+      <span class="pwd-label" id="pwd-label" style="color:rgba(255,255,255,0.3);">Enter a password</span>
 
       <button class="ob-btn" onclick="doSignUp()">Create Account 📚</button>
-      <p class="ob-privacy">By signing up you agree to our Privacy Policy and Terms of Use.</p>
+      <p class="ob-privacy">By signing up you agree to our <span style="color:#f59e0b;cursor:pointer;" onclick="showFromDrawer('privacy')">Privacy Policy</span> and <span style="color:#f59e0b;cursor:pointer;" onclick="showFromDrawer('terms')">Terms of Use</span>.</p>
     </div>
 
     <!-- LOG IN -->
@@ -383,6 +397,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
         <input class="ob-input" id="li-password" type="password" placeholder="Your password"/>
         <button class="ob-eye" onclick="togglePwd('li-password',this)">👁</button>
       </div>
+      <span class="forgot-link" onclick="doForgotPassword()">Forgot password?</span>
 
       <button class="ob-btn" onclick="doLogin()">Log In 📚</button>
       <span style="color:#f59e0b;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-align:center;display:block;margin-top:12px;" onclick="switchAuth('signup')">Don't have an account? Sign up</span>
@@ -1751,8 +1766,14 @@ async function doSignUp(){
   try{
     const r=await supaXHR('/auth/v1/signup','POST',{email,password,data:{name,age_group:selectedAge}});
     if(r.status===200||r.status===201){
-      authToken=r.data.access_token;
       authUser=r.data.user;
+      // Check if email confirmation is required
+      if(!r.data.access_token){
+        // Email verification required
+        showVerifyScreen(email);
+        return;
+      }
+      authToken=r.data.access_token;
       await supaXHR('/rest/v1/profiles','POST',{id:authUser.id,name,email,age_group:selectedAge,goal:5},authToken);
       const userData={id:authUser.id,email,name,age_group:selectedAge,created_at:new Date().toISOString()};
       localStorage.setItem('zibee_token',authToken);
@@ -1762,7 +1783,15 @@ async function doSignUp(){
       document.getElementById('app').style.display='block';
       initApp();
     }else{
-      showAuthMsg(r.data.error_description||r.data.msg||r.data.message||'Sign up failed. Please try again.','error');
+      const errMsg = r.data.error_description||r.data.msg||r.data.message||'';
+      if(errMsg.includes('already registered')||errMsg.includes('already been registered')){
+        showAuthMsg('An account with this email already exists. Please log in instead.','error');
+        setTimeout(()=>switchAuth('login'),2000);
+      } else if(errMsg.includes('invalid')){
+        showAuthMsg('Please enter a valid email address.','error');
+      } else {
+        showAuthMsg(errMsg||'Sign up failed. Please try again.','error');
+      }
     }
   }catch(e){showAuthMsg('Connection error. Please try again.','error');}
 }
@@ -1790,7 +1819,14 @@ async function doLogin(){
       document.getElementById('app').style.display='block';
       initApp();
     }else{
-      showAuthMsg(r.data.error_description||'Invalid email or password.','error');
+      const loginErr=r.data.error_description||r.data.msg||'';
+      if(loginErr.includes('Email not confirmed')){
+        showAuthMsg('Please verify your email first. Check your inbox for a confirmation link.','error');
+      } else if(loginErr.includes('Invalid login')||loginErr.includes('invalid')){
+        showAuthMsg('Incorrect email or password. Please try again.','error');
+      } else {
+        showAuthMsg(loginErr||'Login failed. Please try again.','error');
+      }
     }
   }catch(e){showAuthMsg('Connection error. Please try again.','error');}
 }
@@ -1823,6 +1859,73 @@ function renderProfile(){
   if(chal.length>=7)document.getElementById('badge-7').classList.add('earned');
   if(chal.length>=15)document.getElementById('badge-15').classList.add('earned');
   if(chal.length>=30)document.getElementById('badge-30').classList.add('earned');
+}
+
+
+function checkPwdStrength(pwd){
+  const fill=document.getElementById('pwd-fill');
+  const label=document.getElementById('pwd-label');
+  if(!fill)return;
+  let score=0;
+  if(pwd.length>=6)score++;
+  if(pwd.length>=10)score++;
+  if(/[A-Z]/.test(pwd))score++;
+  if(/[0-9]/.test(pwd))score++;
+  if(/[^A-Za-z0-9]/.test(pwd))score++;
+  const levels=[
+    {w:'0%',c:'transparent',t:''},
+    {w:'25%',c:'#f87171',t:'Weak'},
+    {w:'50%',c:'#fb923c',t:'Fair'},
+    {w:'75%',c:'#facc15',t:'Good'},
+    {w:'100%',c:'#34d399',t:'Strong'}
+  ];
+  const l=levels[Math.min(score,4)];
+  fill.style.width=l.w;
+  fill.style.background=l.c;
+  label.textContent=l.t;
+  label.style.color=l.c;
+}
+
+async function doForgotPassword(){
+  const email=document.getElementById('li-email').value.trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showAuthMsg('Please enter your email address first.','error');
+    return;
+  }
+  showAuthMsg('Sending reset link…','success');
+  try{
+    const r=await supaXHR('/auth/v1/recover','POST',{email});
+    showAuthMsg('Password reset link sent! Check your email inbox.','success');
+  }catch(e){
+    showAuthMsg('Could not send reset link. Please try again.','error');
+  }
+}
+
+function showVerifyScreen(email){
+  // Replace onboarding content with verify message
+  const form=document.querySelector('.ob-form');
+  const tabs=document.querySelector('.auth-tabs');
+  const msg=document.getElementById('auth-msg');
+  if(tabs)tabs.style.display='none';
+  if(msg)msg.style.display='none';
+  const wrap=document.querySelector('.ob-wrap');
+  if(wrap){
+    const existing=document.getElementById('verify-screen');
+    if(existing)existing.remove();
+    const div=document.createElement('div');
+    div.id='verify-screen';
+    div.className='verify-wrap';
+    div.innerHTML=`
+      <div class="verify-icon">📬</div>
+      <div class="verify-title">Check Your Email</div>
+      <p class="verify-sub">We sent a verification link to<br/><strong style="color:#F5A800;">${email}</strong><br/><br/>Click the link in your email to activate your account then come back to log in.</p>
+      <button class="ob-btn" onclick="switchAuth('login');document.getElementById('verify-screen').remove();document.querySelector('.auth-tabs').style.display='flex';">Back to Log In 📚</button>
+    `;
+    wrap.appendChild(div);
+    // Hide all forms
+    document.getElementById('auth-signup-form').style.display='none';
+    document.getElementById('auth-login-form').style.display='none';
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
