@@ -1940,7 +1940,47 @@ function initApp(){
 }
 
 // on load
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
+
+  // ── Handle email verification redirect (token in URL hash) ──
+  const hash = window.location.hash;
+  if(hash && hash.includes('access_token=')){
+    const params = new URLSearchParams(hash.replace('#',''));
+    const token = params.get('access_token');
+    const type = params.get('type');
+    if(token){
+      authToken = token;
+      // Clear the hash from URL so it looks clean
+      history.replaceState(null,'',window.location.pathname);
+      // Get user details from Supabase
+      try{
+        const r = await supaXHR('/auth/v1/user','GET',null,authToken);
+        if(r.status===200 && r.data.id){
+          authUser = r.data;
+          const meta = r.data.user_metadata||{};
+          const name = meta.name || r.data.email.split('@')[0];
+          const age_group = meta.age_group || '18+';
+          const email = r.data.email;
+          // Save profile if new signup
+          if(type==='signup'){
+            await supaXHR('/rest/v1/profiles','POST',
+              {id:authUser.id,name,email,age_group,goal:5},authToken
+            );
+          }
+          const userData={id:authUser.id,email,name,age_group,created_at:r.data.created_at};
+          localStorage.setItem('zibee_token',authToken);
+          localStorage.setItem('zibee_user',JSON.stringify(userData));
+          profile={name,email,ageGroup:age_group};
+          document.getElementById('onboarding').classList.add('hidden');
+          document.getElementById('app').style.display='block';
+          initApp();
+          return;
+        }
+      }catch(e){console.log('Token error:',e);}
+    }
+  }
+
+  // ── Handle saved session ──
   const savedToken=localStorage.getItem('zibee_token');
   const savedUser=localStorage.getItem('zibee_user');
   if(savedToken&&savedUser){
