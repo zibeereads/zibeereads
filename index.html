@@ -1753,7 +1753,7 @@ async function doSignUp(){
     if(r.status===200||r.status===201){
       authToken=r.data.access_token;
       authUser=r.data.user;
-      await supaXHR('/rest/v1/profiles','POST',{id:authUser.id,name,age_group:selectedAge,goal:5},authToken);
+      await supaXHR('/rest/v1/profiles','POST',{id:authUser.id,name,email,age_group:selectedAge,goal:5},authToken);
       const userData={id:authUser.id,email,name,age_group:selectedAge,created_at:new Date().toISOString()};
       localStorage.setItem('zibee_token',authToken);
       localStorage.setItem('zibee_user',JSON.stringify(userData));
