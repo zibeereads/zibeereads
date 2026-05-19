@@ -403,6 +403,31 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
       <span style="color:#f59e0b;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-align:center;display:block;margin-top:12px;" onclick="switchAuth('signup')">Don't have an account? Sign up</span>
     </div>
   </div>
+
+<!-- RESET PASSWORD SCREEN -->
+<div id="reset-password-screen" style="display:none;" class="ob-form">
+  <div style="text-align:center;margin-bottom:24px;">
+    <div style="font-size:48px;margin-bottom:12px;">🔐</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#F5A800;margin-bottom:8px;">Set New Password</h2>
+    <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.6;">Choose a strong new password for your Zi-Bee Reads account.</p>
+  </div>
+  <div class="auth-msg" id="reset-msg"></div>
+  <label class="ob-label">New Password</label>
+  <div class="ob-input-wrap">
+    <input class="ob-input" id="reset-password" type="password" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
+    <button class="ob-eye" onclick="togglePwd('reset-password',this)">👁</button>
+  </div>
+  <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill-reset"></div></div>
+  <span class="pwd-label" id="pwd-label-reset" style="color:rgba(255,255,255,0.3);">Enter a password</span>
+  <label class="ob-label">Confirm New Password</label>
+  <div class="ob-input-wrap">
+    <input class="ob-input" id="reset-password-confirm" type="password" placeholder="Repeat your password"/>
+    <button class="ob-eye" onclick="togglePwd('reset-password-confirm',this)">👁</button>
+  </div>
+  <button class="ob-btn" onclick="doResetPassword()">Update Password 🔐</button>
+</div>
+
+
 </div>
 
 <!-- ── APP ── -->
@@ -1755,6 +1780,57 @@ function togglePwd(id,btn){
   btn.textContent=inp.type==='password'?'👁':'🙈';
 }
 
+
+async function doResetPassword(){
+  const pwd=document.getElementById('reset-password').value;
+  const confirm=document.getElementById('reset-password-confirm').value;
+  const msgEl=document.getElementById('reset-msg');
+
+  // Validation
+  if(pwd.length<6){
+    msgEl.textContent='Password must be at least 6 characters.';
+    msgEl.className='auth-msg error';msgEl.style.display='block';return;
+  }
+  if(pwd!==confirm){
+    msgEl.textContent='Passwords do not match. Please try again.';
+    msgEl.className='auth-msg error';msgEl.style.display='block';return;
+  }
+
+  msgEl.textContent='Updating your password…';
+  msgEl.className='auth-msg success';msgEl.style.display='block';
+
+  try{
+    const r=await supaXHR('/auth/v1/user','PUT',{password:pwd},authToken);
+    if(r.status===200){
+      msgEl.textContent='Password updated successfully! Logging you in…';
+      // Get user and log in
+      const ur=await supaXHR('/auth/v1/user','GET',null,authToken);
+      if(ur.status===200&&ur.data.id){
+        const meta=ur.data.user_metadata||{};
+        const name=meta.name||ur.data.email.split('@')[0];
+        const age_group=meta.age_group||'18+';
+        const email=ur.data.email;
+        const userData={id:ur.data.id,email,name,age_group,created_at:ur.data.created_at};
+        localStorage.setItem('zibee_token',authToken);
+        localStorage.setItem('zibee_user',JSON.stringify(userData));
+        profile={name,email,ageGroup:age_group};
+        setTimeout(()=>{
+          document.getElementById('onboarding').classList.add('hidden');
+          document.getElementById('reset-password-screen').style.display='none';
+          document.getElementById('app').style.display='block';
+          initApp();
+        },1500);
+      }
+    }else{
+      msgEl.textContent=r.data.error_description||r.data.msg||'Update failed. Please try again.';
+      msgEl.className='auth-msg error';
+    }
+  }catch(e){
+    msgEl.textContent='Connection error. Please try again.';
+    msgEl.className='auth-msg error';
+  }
+}
+
 async function doSignUp(){
   const name=document.getElementById('su-name').value.trim();
   const email=document.getElementById('su-email').value.trim();
@@ -1863,6 +1939,9 @@ function renderProfile(){
 
 
 function checkPwdStrength(pwd){
+  // Update reset screen strength bar if active
+  const resetFill=document.getElementById('pwd-fill-reset');
+  const resetLabel=document.getElementById('pwd-label-reset');
   const fill=document.getElementById('pwd-fill');
   const label=document.getElementById('pwd-label');
   if(!fill)return;
@@ -1961,6 +2040,15 @@ window.addEventListener('DOMContentLoaded',async()=>{
           const name = meta.name || r.data.email.split('@')[0];
           const age_group = meta.age_group || '18+';
           const email = r.data.email;
+          // Handle recovery (password reset)
+          if(type==='recovery'){
+            // Show reset password screen
+            document.getElementById('auth-signup-form').style.display='none';
+            document.getElementById('auth-login-form').style.display='none';
+            document.querySelector('.auth-tabs').style.display='none';
+            document.getElementById('reset-password-screen').style.display='block';
+            return;
+          }
           // Save profile if new signup
           if(type==='signup'){
             await supaXHR('/rest/v1/profiles','POST',
