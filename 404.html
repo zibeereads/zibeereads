@@ -1,15 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8"/>
+<title>Redirecting...</title>
 <script>
-  const hash = window.location.hash;
-  const search = window.location.search;
-  if(hash || search){
-    window.location.replace('/zibeereads/' + (search||'') + (hash||''));
-  } else {
-    window.location.replace('/zibeereads/');
-  }
+  // Preserve the full URL including hash for Supabase auth callbacks
+  var hash = window.location.hash;
+  var search = window.location.search;
+  var path = '/zibeereads/';
+  
+  // Build the redirect URL preserving everything
+  var redirectTo = path;
+  if(search) redirectTo += search;
+  if(hash) redirectTo += hash;
+  
+  // Use replace so back button works properly
+  window.location.replace(redirectTo);
 </script>
 </head>
-<body></body>
+<body>
+  <p style="font-family:sans-serif;text-align:center;margin-top:40px;color:#f59e0b;">
+    Redirecting to Zi-Bee Reads...
+  </p>
+</body>
 </html>
