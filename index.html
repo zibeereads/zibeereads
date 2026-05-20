@@ -2038,12 +2038,19 @@ window.addEventListener('DOMContentLoaded',async()=>{
 
         // If only a raw OTP token, exchange it for a session first
         if(!accessToken && otpToken){
-          const vr = await supaXHR('/auth/v1/verify','POST',{token: otpToken, type});
+          // Try token_hash format first (newer Supabase)
+          let vr = await supaXHR('/auth/v1/verify','POST',{token_hash: otpToken, type});
           if(vr.status===200 && vr.data.access_token){
             sessionToken = vr.data.access_token;
           } else {
-            console.log('Verify failed:', vr.data);
-            return;
+            // Fallback to legacy token format
+            vr = await supaXHR('/auth/v1/verify','POST',{token: otpToken, type});
+            if(vr.status===200 && vr.data.access_token){
+              sessionToken = vr.data.access_token;
+            } else {
+              console.log('Verify failed (both formats):', vr.data);
+              return;
+            }
           }
         }
 
