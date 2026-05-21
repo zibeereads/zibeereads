@@ -402,31 +402,31 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
       <button class="ob-btn" onclick="doLogin()">Log In 📚</button>
       <span style="color:#f59e0b;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;text-align:center;display:block;margin-top:12px;" onclick="switchAuth('signup')">Don't have an account? Sign up</span>
     </div>
+
+  <!-- RESET PASSWORD SCREEN -->
+  <div id="reset-password-screen" style="display:none;" class="ob-form">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:48px;margin-bottom:12px;">🔐</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#F5A800;margin-bottom:8px;">Set New Password</h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.6;">Choose a strong new password for your Zi-Bee Reads account.</p>
+    </div>
+    <div class="auth-msg" id="reset-msg"></div>
+    <label class="ob-label">New Password</label>
+    <div class="ob-input-wrap">
+      <input class="ob-input" id="reset-password" type="password" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
+      <button class="ob-eye" onclick="togglePwd('reset-password',this)">👁</button>
+    </div>
+    <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill-reset"></div></div>
+    <span class="pwd-label" id="pwd-label-reset" style="color:rgba(255,255,255,0.3);">Enter a password</span>
+    <label class="ob-label">Confirm New Password</label>
+    <div class="ob-input-wrap">
+      <input class="ob-input" id="reset-password-confirm" type="password" placeholder="Repeat your password"/>
+      <button class="ob-eye" onclick="togglePwd('reset-password-confirm',this)">👁</button>
+    </div>
+    <button class="ob-btn" onclick="doResetPassword()">Update Password 🔐</button>
   </div>
 
-<!-- RESET PASSWORD SCREEN -->
-<div id="reset-password-screen" style="display:none;" class="ob-form">
-  <div style="text-align:center;margin-bottom:24px;">
-    <div style="font-size:48px;margin-bottom:12px;">🔐</div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#F5A800;margin-bottom:8px;">Set New Password</h2>
-    <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.6;">Choose a strong new password for your Zi-Bee Reads account.</p>
   </div>
-  <div class="auth-msg" id="reset-msg"></div>
-  <label class="ob-label">New Password</label>
-  <div class="ob-input-wrap">
-    <input class="ob-input" id="reset-password" type="password" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
-    <button class="ob-eye" onclick="togglePwd('reset-password',this)">👁</button>
-  </div>
-  <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill-reset"></div></div>
-  <span class="pwd-label" id="pwd-label-reset" style="color:rgba(255,255,255,0.3);">Enter a password</span>
-  <label class="ob-label">Confirm New Password</label>
-  <div class="ob-input-wrap">
-    <input class="ob-input" id="reset-password-confirm" type="password" placeholder="Repeat your password"/>
-    <button class="ob-eye" onclick="togglePwd('reset-password-confirm',this)">👁</button>
-  </div>
-  <button class="ob-btn" onclick="doResetPassword()">Update Password 🔐</button>
-</div>
-
 </div>
 
 <!-- ── APP ── -->
@@ -1814,7 +1814,6 @@ async function doResetPassword(){
         localStorage.setItem('zibee_user',JSON.stringify(userData));
         profile={name,email,ageGroup:age_group};
         setTimeout(()=>{
-          document.querySelector('.ob-center').style.display='';
           document.getElementById('onboarding').classList.add('hidden');
           document.getElementById('reset-password-screen').style.display='none';
           document.getElementById('app').style.display='block';
@@ -2023,54 +2022,49 @@ window.addEventListener('DOMContentLoaded',async()=>{
 
   // ── Handle email verification / password reset redirect ──
   const hash = window.location.hash;
-  if(hash && hash.includes('type=')){
+  if(hash){
     const params = new URLSearchParams(hash.replace('#',''));
-    const rawToken = params.get('access_token') || params.get('token');
-    const type     = params.get('type');
+    const accessToken = params.get('access_token');
+    const otpToken   = params.get('token');
+    const type       = params.get('type');
+    const token      = accessToken || otpToken;
 
-    if(rawToken && type){
+    if(token && type){
       history.replaceState(null,'',window.location.pathname);
 
       try{
-        // Always exchange — email links are OTP not real JWTs
-        let sessionToken = null;
-        let vr = await supaXHR('/auth/v1/verify','POST',{token_hash: rawToken, type});
-        if(vr.status===200 && vr.data.access_token){
-          sessionToken = vr.data.access_token;
-        } else {
-          vr = await supaXHR('/auth/v1/verify','POST',{token: rawToken, type});
+        let sessionToken = accessToken; // already a JWT if present
+
+        // If only a raw OTP token, exchange it for a session first
+        if(!accessToken && otpToken){
+          // Try token_hash format first (newer Supabase)
+          let vr = await supaXHR('/auth/v1/verify','POST',{token_hash: otpToken, type});
           if(vr.status===200 && vr.data.access_token){
             sessionToken = vr.data.access_token;
           } else {
-            console.log('Verify failed:', vr.data);
-            if(type==='recovery'){
-              document.getElementById('auth-signup-form').style.display='none';
-              document.getElementById('auth-login-form').style.display='none';
-              document.querySelector('.auth-tabs').style.display='none';
-              document.querySelector('.ob-center').style.display='none';
-              document.getElementById('reset-password-screen').style.display='block';
-              const m=document.getElementById('reset-msg');
-              m.textContent='This link has expired. Please request a new password reset.';
-              m.className='auth-msg error';m.style.display='block';
+            // Fallback to legacy token format
+            vr = await supaXHR('/auth/v1/verify','POST',{token: otpToken, type});
+            if(vr.status===200 && vr.data.access_token){
+              sessionToken = vr.data.access_token;
+            } else {
+              console.log('Verify failed (both formats):', vr.data);
+              return;
             }
-            return;
           }
         }
 
         authToken = sessionToken;
 
+        // Handle recovery (password reset) — show reset screen before fetching user
         if(type==='recovery'){
           document.getElementById('auth-signup-form').style.display='none';
           document.getElementById('auth-login-form').style.display='none';
           document.querySelector('.auth-tabs').style.display='none';
-          document.querySelector('.ob-center').style.display='none';
-          const m=document.getElementById('reset-msg');
-          m.textContent='';m.style.display='none';
           document.getElementById('reset-password-screen').style.display='block';
           return;
         }
 
-        // Signup — fetch user and log in
+        // For signup/magiclink — fetch user and log them in
         const r = await supaXHR('/auth/v1/user','GET',null,authToken);
         if(r.status===200 && r.data.id){
           authUser = r.data;
