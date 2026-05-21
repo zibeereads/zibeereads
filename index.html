@@ -1814,6 +1814,7 @@ async function doResetPassword(){
         localStorage.setItem('zibee_user',JSON.stringify(userData));
         profile={name,email,ageGroup:age_group};
         setTimeout(()=>{
+          document.querySelector('.ob-center').style.display='';
           document.getElementById('onboarding').classList.add('hidden');
           document.getElementById('reset-password-screen').style.display='none';
           document.getElementById('app').style.display='block';
@@ -2022,7 +2023,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
 
   // ── Handle email verification / password reset redirect ──
   const hash = window.location.hash;
-  if(hash){
+  if(hash && hash.includes('type=')){
     const params = new URLSearchParams(hash.replace('#',''));
     const rawToken = params.get('access_token') || params.get('token');
     const type     = params.get('type');
@@ -2031,49 +2032,45 @@ window.addEventListener('DOMContentLoaded',async()=>{
       history.replaceState(null,'',window.location.pathname);
 
       try{
-        // Always exchange — Supabase email links send OTP, not a real JWT
+        // Always exchange — email links are OTP not real JWTs
         let sessionToken = null;
-
-        // token_hash is the correct field name for Supabase v2
         let vr = await supaXHR('/auth/v1/verify','POST',{token_hash: rawToken, type});
         if(vr.status===200 && vr.data.access_token){
           sessionToken = vr.data.access_token;
         } else {
-          // Fallback with token field
           vr = await supaXHR('/auth/v1/verify','POST',{token: rawToken, type});
           if(vr.status===200 && vr.data.access_token){
             sessionToken = vr.data.access_token;
           } else {
-            // Show error on reset screen if recovery, otherwise just log
+            console.log('Verify failed:', vr.data);
             if(type==='recovery'){
               document.getElementById('auth-signup-form').style.display='none';
               document.getElementById('auth-login-form').style.display='none';
               document.querySelector('.auth-tabs').style.display='none';
+              document.querySelector('.ob-center').style.display='none';
               document.getElementById('reset-password-screen').style.display='block';
               const m=document.getElementById('reset-msg');
-              m.textContent='This reset link has expired. Please request a new one.';
+              m.textContent='This link has expired. Please request a new password reset.';
               m.className='auth-msg error';m.style.display='block';
             }
-            console.log('Verify failed:', vr.data);
             return;
           }
         }
 
         authToken = sessionToken;
 
-        // Handle recovery — show reset screen with valid token ready
         if(type==='recovery'){
           document.getElementById('auth-signup-form').style.display='none';
           document.getElementById('auth-login-form').style.display='none';
           document.querySelector('.auth-tabs').style.display='none';
-          document.getElementById('reset-password-screen').style.display='block';
-          // Clear any stale error messages
+          document.querySelector('.ob-center').style.display='none';
           const m=document.getElementById('reset-msg');
           m.textContent='';m.style.display='none';
+          document.getElementById('reset-password-screen').style.display='block';
           return;
         }
 
-        // For signup/magiclink — fetch user and log them in
+        // Signup — fetch user and log in
         const r = await supaXHR('/auth/v1/user','GET',null,authToken);
         if(r.status===200 && r.data.id){
           authUser = r.data;
