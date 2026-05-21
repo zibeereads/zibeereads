@@ -2024,43 +2024,52 @@ window.addEventListener('DOMContentLoaded',async()=>{
   const hash = window.location.hash;
   if(hash){
     const params = new URLSearchParams(hash.replace('#',''));
-    const accessToken = params.get('access_token');
-    const otpToken   = params.get('token');
-    const type       = params.get('type');
-    const token      = accessToken || otpToken;
+    const rawToken = params.get('access_token') || params.get('token');
+    const type     = params.get('type');
 
-    if(token && type){
+    if(rawToken && type){
       history.replaceState(null,'',window.location.pathname);
 
       try{
-        let sessionToken = accessToken; // already a JWT if present
+        // Always exchange — Supabase email links send OTP, not a real JWT
+        let sessionToken = null;
 
-        // If only a raw OTP token, exchange it for a session first
-        if(!accessToken && otpToken){
-          // Try token_hash format first (newer Supabase)
-          let vr = await supaXHR('/auth/v1/verify','POST',{token_hash: otpToken, type});
+        // token_hash is the correct field name for Supabase v2
+        let vr = await supaXHR('/auth/v1/verify','POST',{token_hash: rawToken, type});
+        if(vr.status===200 && vr.data.access_token){
+          sessionToken = vr.data.access_token;
+        } else {
+          // Fallback with token field
+          vr = await supaXHR('/auth/v1/verify','POST',{token: rawToken, type});
           if(vr.status===200 && vr.data.access_token){
             sessionToken = vr.data.access_token;
           } else {
-            // Fallback to legacy token format
-            vr = await supaXHR('/auth/v1/verify','POST',{token: otpToken, type});
-            if(vr.status===200 && vr.data.access_token){
-              sessionToken = vr.data.access_token;
-            } else {
-              console.log('Verify failed (both formats):', vr.data);
-              return;
+            // Show error on reset screen if recovery, otherwise just log
+            if(type==='recovery'){
+              document.getElementById('auth-signup-form').style.display='none';
+              document.getElementById('auth-login-form').style.display='none';
+              document.querySelector('.auth-tabs').style.display='none';
+              document.getElementById('reset-password-screen').style.display='block';
+              const m=document.getElementById('reset-msg');
+              m.textContent='This reset link has expired. Please request a new one.';
+              m.className='auth-msg error';m.style.display='block';
             }
+            console.log('Verify failed:', vr.data);
+            return;
           }
         }
 
         authToken = sessionToken;
 
-        // Handle recovery (password reset) — show reset screen before fetching user
+        // Handle recovery — show reset screen with valid token ready
         if(type==='recovery'){
           document.getElementById('auth-signup-form').style.display='none';
           document.getElementById('auth-login-form').style.display='none';
           document.querySelector('.auth-tabs').style.display='none';
           document.getElementById('reset-password-screen').style.display='block';
+          // Clear any stale error messages
+          const m=document.getElementById('reset-msg');
+          m.textContent='';m.style.display='none';
           return;
         }
 
