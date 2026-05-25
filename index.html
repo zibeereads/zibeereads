@@ -200,6 +200,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
 .days-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px;}
 @media(min-width:400px){.days-grid{grid-template-columns:repeat(6,1fr);}}
 @media(min-width:520px){.days-grid{grid-template-columns:repeat(10,1fr);}}
+.day-dot.future{opacity:0.3;cursor:default;pointer-events:none;}
 .day-dot{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1.5px solid var(–border);background:var(–card);color:var(–muted);cursor:pointer;transition:all .2s;}
 .day-dot.on{background:var(–honey);border-color:var(–honey);color:var(–primary-fg);box-shadow:0 0 12px rgba(245,158,11,.5);}
 .day-dot:hover:not(.on){border-color:rgba(245,158,11,.4);color:rgba(245,158,11,.7);}
@@ -546,8 +547,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
     <h1 class="home-title" id="home-title">Zi-Bee Reads</h1>
     <p class="home-tagline" id="home-tagline">Your Reading Journey Starts Here. Like a warm hug from a bookish friend.</p>
     <div id="welcome-banner" class="welcome-banner" style="display:none;">
-      <div class="wb-emoji" id="wb-emoji">👤</div>
-      <div><div class="wb-name" id="wb-name"></div><div class="wb-tip" id="wb-tip"></div></div>
+      <div style="text-align:center;flex:1;"><div class="wb-name" id="wb-name"></div><div class="wb-tip" id="wb-tip"></div></div>
     </div>
   </div>
   <div class="feat-grid" id="featGrid"></div>
@@ -710,16 +710,16 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
   <h1 class="page-title" id="chal-title">🏆 30-Day Reading <span>Challenge</span></h1>
   <p class="page-sub" id="chal-sub">Read for at least 15 minutes a day. Tap a circle to mark it complete!</p>
   <div class="chal-hero">
-    <h2 id="chal-hero-title">May Reading Challenge</h2>
+    <h2 id="chalHeroTitle">May Reading Challenge</h2>
     <p id="chal-hero-sub">Tap each day you read to track your progress</p>
-    <span class="badge badge-gold" id="chalCount">0 / 30 days</span>
+    <span class="badge badge-gold" id="chalCount">0 days</span>
   </div>
   <div class="days-grid" id="daysGrid"></div>
   <hr class="div"/>
   <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:14px;" id="chal-rewards">🎁 Your Rewards</h3>
   <div class="rew-card" id="rew-card-7"><div class="rew-icon">⭐</div><div style="flex:1"><div class="rew-title" id="rew-7-title">7-Day Streak</div><div class="rew-sub" id="rew-7-sub">Read for 7 days</div></div><div id="rew7"><span class="badge badge-muted" id="rew7-badge">🔒 Locked</span></div></div>
   <div class="rew-card" id="rew-card-15"><div class="rew-icon">🌟</div><div style="flex:1"><div class="rew-title" id="rew-15-title">15-Day Streak</div><div class="rew-sub" id="rew-15-sub">Read for 15 days</div></div><div id="rew15"><span class="badge badge-muted" id="rew15-badge">🔒 Locked</span></div></div>
-  <div class="rew-card" id="rew-card-30"><div class="rew-icon">🏆</div><div style="flex:1"><div class="rew-title" id="rew-30-title">30-Day Champion</div><div class="rew-sub" id="rew-30-sub">Read for 30 days</div></div><div id="rew30"><span class="badge badge-muted" id="rew30-badge">🔒 Locked</span></div></div>
+  <div class="rew-card" id="rew-card-30"><div class="rew-icon">🏆</div><div style="flex:1"><div class="rew-title" id="rew-30-title">Monthly Champion</div><div class="rew-sub" id="rew-30-sub">Complete the whole month</div></div><div id="rew30"><span class="badge badge-muted" id="rew30-badge">🔒 Locked</span></div></div>
 </div>
 
 <!-- ABOUT US -->
@@ -924,7 +924,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
     <div class="badge-row">
       <div class="badge-item" id="badge-7"><span class="bi">⭐</span>Early Reader</div>
       <div class="badge-item" id="badge-15"><span class="bi">🌟</span>Bookworm</div>
-      <div class="badge-item" id="badge-30"><span class="bi">🏆</span>30-Day Champ</div>
+      <div class="badge-item" id="badge-30"><span class="bi">🏆</span>Monthly Champ</div>
     </div>
   </div>
 
@@ -969,7 +969,7 @@ const T = {
       {icon:"📚",name:"Reading Tracker",desc:"Log your books and see your progress grow."},
       {icon:"🎯",name:"Book Quiz",desc:"Which character are you? Take the quiz to find out!"},
       {icon:'<img src="https://res.cloudinary.com/dhudiirqu/image/upload/v1779470909/db661901-1bf0-4ac5-ae4f-8e04fa48f46a_jankut.png" width="36" height="36" style="border-radius:6px;" alt=""/>',name:"Zi-Bee Picks",desc:"Amazing stories handpicked by Zi-Bee."},
-      {icon:"🏆",name:"30-Day Challenge",desc:"Build a reading habit and earn special badges."}
+      {icon:"🏆",name:"Monthly Challenge",desc:"Build a reading habit and earn special badges."}
     ],
     age_tips:{"5-8":{e:"🌈",t:"Every story is a new adventure! Pick a book with a fun cover today."},"9-12":{e:"🚀",t:"The best books will take you to worlds you've never imagined. Ready to explore?"},"13-17":{e:"💫",t:"Reading builds the person you're becoming. Find a story that challenges you."},"18+":{e:"📖",t:"Great books sharpen the mind and open the heart. What will you discover next?"}},
     rec_title:"Discover Your Next Book",rec_sub:"Tell us what you're looking for and we'll find the perfect match.",
@@ -1000,7 +1000,7 @@ const T = {
     picks_title:"Zi-Bee Picks",picks_sub:"Amazing stories handpicked by Zi-Bee.",
     filter_all:"All Ages",filter_kids:"Kids 5–12",filter_teen:"Teens 13–17",filter_adult:"Adults 18+",picks_by:"by",
     picks_audiobook:"🎧 Audiobook",picks_kindle:"📱 Kindle",picks_paperback:"📖 Paperback",
-    chal_title:"30-Day Reading Challenge",chal_sub:"Read for at least 15 minutes a day. Tap a circle to mark it complete!",
+    chal_title:"Monthly Reading Challenge",chal_sub:"Read for at least 15 minutes a day. Tap a circle to mark it complete!",
     chal_hero:"May Reading Challenge 🌟",chal_hero_sub:"Tap each day you read to track your progress",
     chal_rewards:"🎁 Your Rewards",
     rew:["Bookworm in Training","Avid Reader","Literary Master"],
@@ -1474,7 +1474,8 @@ const PICKS=[
 let lang="en", profile=null, remember=true, selectedAge="13-17";
 let books=JSON.parse(localStorage.getItem("zibee_books")||"[]");
 let goal=parseInt(localStorage.getItem("zibee_goal")||"5");
-let chalDays=JSON.parse(localStorage.getItem("zibee_chal")||"[]");
+const _chalKey=()=>{const n=new Date();return`zibee_chal_${n.getFullYear()}_${n.getMonth()+1}`;};
+let chalDays=JSON.parse(localStorage.getItem(_chalKey())||"[]");
 let recSel={age:null,genre:null,mood:null};
 let qIdx=0, qAnswers=[];
 let pickFilter="all";
@@ -1649,7 +1650,7 @@ function applyTranslations(){
   renderPicks();
   // challenge
   document.getElementById('chal-sub').textContent=L.chal_sub;
-  document.getElementById('chal-hero-title').textContent=L.chal_hero;
+  // Monthly title set dynamically in renderChallenge
   document.getElementById('chal-hero-sub').textContent=L.chal_hero_sub;
   document.getElementById('chal-rewards').textContent=L.chal_rewards;
   document.getElementById('rew-7-title').textContent=L.rew[0];
@@ -2046,8 +2047,7 @@ function renderWelcomeBanner(){
   const tip=L.age_tips?.[profile.ageGroup]||L.age_tips?.["18+"];
   const banner=document.getElementById('welcome-banner');
   if(tip){
-    document.getElementById('wb-emoji').textContent=tip.e;
-    document.getElementById('wb-name').textContent=`Welcome aboard, ${profile.name.split(' ')[0]}!`;
+      document.getElementById('wb-name').textContent=`Welcome aboard, ${profile.name.split(' ')[0]}!`;
     document.getElementById('wb-tip').textContent=tip.t;
     banner.style.display='flex';
   }
@@ -2285,26 +2285,37 @@ function setPickFilter(f,el){
 // ── CHALLENGE ─────────────────────────────────────────────────────────────
 function renderChallenge(){
   const L=T[lang]||T.en;
+  const now=new Date();
+  const year=now.getFullYear();
+  const month=now.getMonth();
+  const monthName=now.toLocaleString('default',{month:'long'});
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const today=now.getDate();
   const n=chalDays.length;
-  document.getElementById('chalCount').textContent=`${n} / 30`;
+  // Update title and hero text dynamically
+  document.getElementById('chal-title').innerHTML=`🏆 ${monthName} Reading <span>Challenge</span>`;
+  document.getElementById('chalHeroTitle').textContent=`${monthName} ${year} Reading Challenge 🌟`;
+  document.getElementById('chalCount').textContent=`${n} / ${daysInMonth} days`;
   const grid=document.getElementById('daysGrid');
   let html='';
-  for(let d=1;d<=30;d++){
+  for(let d=1;d<=daysInMonth;d++){
     const on=chalDays.includes(d);
-    html+=`<div class="day-dot ${on?'on':''}" onclick="toggleDay(${d})">${on?'✓':d}</div>`;
+    const isFuture=d>today;
+    html+=`<div class="day-dot ${on?'on':''} ${isFuture?'future':''}" ${!isFuture?`onclick="toggleDay(${d})"`:''} title="${isFuture?'Future day':''}">${on?'✓':d}</div>`;
   }
   grid.innerHTML=html;
   const unlock=(cardId,badgeId,cond)=>{
     document.getElementById(cardId).classList.toggle('unlocked',cond);
     document.getElementById(badgeId).innerHTML=cond?`<span class="badge badge-green">${L.unlocked}</span>`:`<span class="badge badge-muted">${L.locked}</span>`;
   };
+  const half=Math.floor(daysInMonth/2);
   unlock('rew-card-7','rew7',n>=7);
-  unlock('rew-card-15','rew15',n>=15);
-  unlock('rew-card-30','rew30',n>=30);
+  unlock('rew-card-15','rew15',n>=half);
+  unlock('rew-card-30','rew30',n>=daysInMonth);
 }
 function toggleDay(d){
   chalDays=chalDays.includes(d)?chalDays.filter(x=>x!==d):[...chalDays,d];
-  localStorage.setItem('zibee_chal',JSON.stringify(chalDays));
+  localStorage.setItem(_chalKey(),JSON.stringify(chalDays));
   renderChallenge();
 }
 
@@ -2499,7 +2510,7 @@ function renderProfile(){
   if(u.created_at)document.getElementById('profile-joined').textContent=new Date(u.created_at).toLocaleDateString();
   document.getElementById('profile-avatar').textContent=u.name.charAt(0).toUpperCase();
   const bks=JSON.parse(localStorage.getItem('zibee_books')||'[]');
-  const chal=JSON.parse(localStorage.getItem('zibee_chal')||'[]');
+  const chal=JSON.parse(localStorage.getItem(_chalKey())||'[]');
   document.getElementById('pr-total').textContent=bks.length;
   document.getElementById('pr-done').textContent=bks.filter(b=>b.done).length;
   document.getElementById('pr-days').textContent=chal.length;
