@@ -2270,8 +2270,8 @@ function renderPicks(){
       <div class="pick-tags">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join('')}</div>
       <div class="pick-formats">
         ${p.audiobook ? `<a class="pick-fmt" href="${p.audiobook}" target="_blank">${L.picks_audiobook}</a>` : ''}
-        <a class="pick-fmt" href="${p.kindle}" target="_blank">${L.picks_kindle}</a>
-        <a class="pick-fmt" href="${p.paperback}" target="_blank">${L.picks_paperback}</a>
+        ${p.kindle ? `<a class="pick-fmt" href="${p.kindle}" target="_blank">${L.picks_kindle}</a>` : ''}
+        ${(p.paperback || p.Hardcover) ? `<a class="pick-fmt" href="${p.paperback || p.Hardcover}" target="_blank">${p.paperback ? L.picks_paperback : '📖 Hardcover'}</a>` : ''}
       </div>
     </div>`).join('');
 }
