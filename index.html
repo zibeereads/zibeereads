@@ -47,7 +47,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 nav{position:sticky;top:0;z-index:100;background:rgba(28,10,0,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(–border);}
 .nav-top{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 8px;}
 .nav-logo{font-family:‘Playfair Display’,serif;font-size:20px;font-weight:900;color:var(–honey);}
-.lang-sel{background:rgba(255,255,255,.07);border:1px solid var(–border);color:#fff;font-family:‘Nunito’,sans-serif;font-size:12px;font-weight:700;padding:6px 12px;border-radius:30px;cursor:pointer;outline:none;}
+.lang-sel{background:rgba(255,255,255,.07);border:1px solid var(–border);color:#fff;font-family:‘Nunito’,sans-serif;font-size:11px;font-weight:700;padding:5px 6px;border-radius:30px;cursor:pointer;outline:none;max-width:120px;}
 .lang-sel option{background:#2d1200;}
 .nav-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 16px 10px;}
 .nav-tabs::-webkit-scrollbar{display:none;}
@@ -467,7 +467,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
       <button class="hamburger" id="hamburger" onclick="toggleDrawer()">
         <span></span><span></span><span></span>
       </button>
-      <div class="nav-logo"><img src="https://res.cloudinary.com/dhudiirqu/image/upload/v1779470909/db661901-1bf0-4ac5-ae4f-8e04fa48f46a_jankut.png" width="26" height="26" style="vertical-align:middle;margin-right:6px;border-radius:4px;" alt="Zi-Bee"/> Zi-Bee Reads</div>
+      <div class="nav-logo" style="text-align:center;">Zi-Bee Reads</div>
     </div>
     <select class="lang-sel" onchange="setLang(this.value)" id="langSel">
       <option value="en">🇬🇧 English</option>
@@ -484,7 +484,6 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
       <option value="ko">🇰🇷 한국어</option>
       <option value="hi">🇮🇳 हिन्दी</option>
       <option value="ha">🇳🇬 Hausa</option>
-      <option value="yo">🇳🇬 Yorùbá</option>
     </select>
   </div>
 </nav>
@@ -622,7 +621,6 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
       <option value="Korean">Korean / 한국어</option>
       <option value="Hindi">Hindi / हिन्दी</option>
       <option value="Hausa">Hausa</option>
-      <option value="Yoruba">Yorùbá</option>
     </select>
     <button class="btn btn-gold w100" id="recBtn" onclick="getRecommendation()" disabled>✨ Find My Books</button>
   </div>
@@ -1442,27 +1440,6 @@ const T = {
     rew:["Ɗalibin Karatu","Mai Sha'awar Karatu","Gwanin Adabi"],rew_sub:(n)=>`Ka karanta kwana ${n}`,locked:"🔒 Kullewa",unlocked:"✅ An buɗe",
     ob_title:"Barka da zuwa Zi-Bee Reads!",ob_sub:"Faɗa mana game da kai don mu daidaita kwarewar ka.",ob_name:"Sunanka",ob_age:"Rukunin Shekaru",ob_email:"Adireshi na Email",ob_remember:"Ka tuna ni a wannan na'ura",ob_remember_sub:"Ba za ka buƙaci shiga gaba ba",ob_btn:"Fara Karatu! 📚",ob_privacy:"Bayananku an ajiye su a wannan na'urar kawai."
   },
-  yo:{
-    nav:["🏠 Ile","✨ Ṣàwárí","📚 Àwọn Ìwé Mi","🎯 Ìdánwò","Zi-Bee Picks","🏆 Ìpèníjà"],
-    home_tagline:"Ìrìn àjò kíkà rẹ bẹ̀rẹ̀ níbí. Bí ìgbádùn lọ́wọ́ ọ̀rẹ́ olólùfẹ́ ìwé.",
-    home_find:"Wá Ìwé",
-    feats:[{icon:"✨",name:"Ṣàwárí Àwọn Ìwé",desc:"Wá ìwé rẹ tẹ̀lé pẹ̀lú ètò ìmọ̀-ẹrọ wa."},{icon:"📖",name:"Ilé-Ìkàwé Ọ̀fẹ́",desc:"Ọgọ́rọ̀ọ̀rún e-book àti audiobook alailẹgbẹ ọ̀fẹ́."},{icon:"📚",name:"Ètò Tọpinpin Kíkà",desc:"Forí àwọn ìwé rẹ kọ, wò ìlọsíwájú rẹ."},{icon:"🎯",name:"Ìdánwò Ìwé",desc:"Ìwà wo ni ìwọ? Ṣe ìdánwò kí o mọ!"},{icon:"🏆",name:"Ìpèníjà Ọjọ́ 30",desc:"Kọ àṣà kíkà, gba àmì ìyasọtọ."}],
-    age_tips:{"5-8":{e:"🌈",t:"Ìtàn kọ̀ọ̀kan jẹ́ ìrìn àjò tuntun!"},"9-12":{e:"🚀",t:"Àwọn ìwé tó dára jù máa ń gbé ọ lọ sí àwọn ayé tí o kò rò rí."},"13-17":{e:"💫",t:"Kíkà ń kọ́ ènìyàn tí ìwọ ń di."},"18+":{e:"📖",t:"Àwọn ìwé ńlá ń mú ọpọlọ dára, ń sí àyà. Kí ni ìwọ ó ṣàwárí tókàn?"}},
-    rec_title:"Ṣàwárí Ìwé Rẹ Tókàn",rec_sub:"Sọ fún wa ohun tí o n wá, a ó wá èyí tó bá a mu.",
-    rec_age:"Ẹgbẹ́ Ọjọ́-orí",rec_genre:"Irú",rec_mood:"Ìmọ̀lára",rec_lang:"Èdè Ìmọ̀ràn",rec_btn:"✨ Wá Ìwé Mi",rec_searching:"Ń wá…",
-    genres:["Ìrìn Àjò","Fantasy","Àṣírí","Ìfẹ́","Sáyẹ́nsì Àlọ","Tòótọ́","Ẹ̀rù","Àbàtán","Ìtàn Ìjọba","Graphic Novel","Ìdàgbàsókè Ara Ẹni","Ìtàn Ìgbésí Ayé","Thriller","Ìwà Ọ̀daràn","Ewì","Eré Ìdárayá","Ọ̀dọ́","Manga","Ìgbàgbọ́","Òde Òní"],
-    moods:["Ìgbòkègbodò","Ìsinmi","Ìfúnni Ní Agbára","Ìmọ̀lára","Ìdùnnú","Ìfẹ́","Òkùnkùn","Ìfẹ́ Àárọ̀","Àṣírí","Agbára"],
-    ages:["5-8","9-12","13-17","18+"],rec_your:"📚 Ìmọ̀ràn Fún Ọ",
-    track_title:"Ètò Tọpinpin Kíkà",track_sub:"Ṣe àkọsílẹ̀ ìrìn àjò kíkà rẹ.",goal_lbl:"Àfojúsùn Oṣù Yìí",goal_val:(d,g)=>`${d} nínú ${g} ìwé`,goal_reached:"🎉 Àfojúsùn Dé!",goal_adj:"Ṣe àtúnṣe àfojúsùn kíkà oṣùwọ̀n",
-    s_added:"Ní àfikún",s_finished:"Parí",s_progress:"Ń ka",track_add:"Ṣàfikún Ìwé",track_title_ph:"Orúkọ ìwé…",track_author_ph:"Òǹkọ̀wé (yàn)",track_add_btn:"+ Ṣàfikún Ìwé",track_empty:"Kò sí ìwé. Ṣàfikún èkíní! 📖",
-    quiz_title:"Ìwà Wo Ni Ìwọ?",quiz_sub:"Ṣàwárí ìwà kíkà rẹ pẹ̀lú ìbéèrè 5.",quiz_start:"Bẹ̀rẹ̀ Ìdánwò →",quiz_retry:"🔄 Gbìyànjú Lẹ́ẹ̀kan Síi",quiz_of:(n,t)=>`Ìbéèrè ${n} / ${t}`,quiz_result:"Àbájáde Rẹ",
-    Qs:[{q:"Ọ̀sán ọ̀fẹ́, kí ni o ń ṣe?",opts:["Ìrìn àjò ní ìta","Kíkà ní àlàáfíà","Yanjú ìṣòro tó ṣòro","Jẹ́ kí ìrònú ṣiṣẹ́"]},{q:"Bí àwọn ọ̀rẹ́ ṣe ń ṣàpèjúwe rẹ?",opts:["Akíkanjú tí kò bẹ̀rù","Onímọ̀ tó ń ronú jinlẹ̀","Onínúrere tó ń tọ́jú","Onítàn tó ń rò àlá"]},{q:"Agbára àjùmọ̀ rẹ?",opts:["Agbára nla","Àìrí","Agbára ìwòsàn","Di ohunkóhun"]},{q:"Ìparí ìtàn tó fẹ́?",opts:["Akíkanjú gbà ọjọ́!","Yípadà tí a kò retí","Gbogbo ènìyàn ayọ̀","Ìparí tó jinlẹ̀"]},{q:"Níbo ni o fẹ́ gbé?",opts:["Igbó tàbí òkè","Ilé-ìkàwé ìkọ̀kọ̀ ìsàlẹ̀ ilẹ̀","Abúlé ìtẹ̀lé omi","Ìlú tó n fò lórí àwọsanma"]}],
-    results:[{e:"⚔️",n:"Akíkanjú Ìgboyà",d:"Akíkanjú tí kò bẹ̀rù!"},{e:"🔍",n:"Olùṣèwádìí Ọlọ́gbọ́n",d:"Ọpọlọ géégé àti ìfẹ́ mọ̀ tó pọ̀."},{e:"💫",n:"Ọkàn Rẹlẹ̀",d:"Ọkàn ń dari rẹ."},{e:"🌿",n:"Olùrò Àlá",d:"Ìrònú rẹ kò ní ìdíwọ̀n."}],
-    picks_title:"Zi-Bee Picks",picks_sub:"Àwọn ìtàn ìyanu tí Zi-Bee yan.",filter_all:"Gbogbo Ọjọ́-orí",filter_kids:"Àwọn Ọmọ 5–12",filter_teen:"Àwọn Ọ̀dọ́ 13–17",filter_adult:"Àwọn Àgbà 18+",picks_by:"nípa",picks_audiobook:"🎧 Audiobook",picks_kindle:"📱 Kindle",picks_paperback:"📖 Ìwé Tẹ̀wé",
-    chal_title:"Ìpèníjà Kíkà Ọjọ́ 30",chal_sub:"Ka ìṣẹ́jú 15 tàbí jù bẹ́ẹ̀ lọ lójoojúmọ́.",chal_hero:"Ìpèníjà Kíkà May 🌟",chal_hero_sub:"Tẹ àwọn ọjọ́ tí o kàwé",chal_rewards:"🎁 Àwọn Èrè Rẹ",
-    rew:["Akẹ́kọ̀ọ́ Kíkà","Olùkà Ọ̀pọ̀lọpọ̀","Ògbógi Ìmọ̀-ìwé"],rew_sub:(n)=>`Ka fún ọjọ́ ${n}`,locked:"🔒 Tiítì",unlocked:"✅ Ṣípayà",
-    ob_title:"Káàbọ̀ sí Zi-Bee Reads!",ob_sub:"Sọ fún wa nípa rẹ kí a lè ṣe àtúnṣe ìrírí rẹ.",ob_name:"Orúkọ Rẹ",ob_age:"Ẹgbẹ́ Ọjọ́-orí",ob_email:"Àdírẹ́ẹ̀sì Ímeèlì",ob_remember:"Rántí mi lórí ẹ̀rọ yìí",ob_remember_sub:"Kò ní nílò wíwọlé lẹ́ẹ̀kan síi",ob_btn:"Bẹ̀rẹ̀ Kíkà! 📚",ob_privacy:"Àlàyé rẹ ni a fi pamọ́ sórí ẹ̀rọ yìí nìkan."
-  }
 };
 
 // ── PICKS DATA ────────────────────────────────────────────────────────────
@@ -2070,7 +2047,7 @@ function renderWelcomeBanner(){
   const banner=document.getElementById('welcome-banner');
   if(tip){
     document.getElementById('wb-emoji').textContent=tip.e;
-    document.getElementById('wb-name').textContent=`Welcome back, ${profile.name.split(' ')[0]}!`;
+    document.getElementById('wb-name').textContent=`Welcome aboard, ${profile.name.split(' ')[0]}!`;
     document.getElementById('wb-tip').textContent=tip.t;
     banner.style.display='flex';
   }
