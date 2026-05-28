@@ -378,7 +378,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
 
       <label class="ob-label">Password</label>
       <div class="ob-input-wrap">
-        <input class="ob-input" id="su-password" type="password" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
+        <input class="ob-input" id="su-password" type="password" placeholder="Min 8 chars, A-Z, 0-9, symbol" oninput="checkPwdStrength(this.value)"/>
         <button class="ob-eye" onclick="togglePwd('su-password',this)">👁</button>
       </div>
       <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill"></div></div>
@@ -414,7 +414,7 @@ hr.div{border:none;border-top:1px solid var(–border);margin:20px 0;}
     <div class="auth-msg" id="reset-msg"></div>
     <label class="ob-label">New Password</label>
     <div class="ob-input-wrap">
-      <input class="ob-input" id="reset-password" type="password" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
+      <input class="ob-input" id="reset-password" type="password" placeholder="Min 8 chars, A-Z, 0-9, symbol" oninput="checkPwdStrength(this.value)"/>
       <button class="ob-eye" onclick="togglePwd('reset-password',this)">👁</button>
     </div>
     <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill-reset"></div></div>
@@ -2372,8 +2372,9 @@ async function doResetPassword(){
   const msgEl=document.getElementById('reset-msg');
 
   // Validation
-  if(pwd.length<6){
-    msgEl.textContent='Password must be at least 6 characters.';
+  const resetPwdOk=/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(pwd);
+  if(!resetPwdOk){
+    msgEl.textContent='Password must be 8+ characters with uppercase, lowercase, number and symbol (e.g. Abc123!).';
     msgEl.className='auth-msg error';msgEl.style.display='block';return;
   }
   if(pwd!==confirm){
@@ -2422,7 +2423,8 @@ async function doSignUp(){
   const password=document.getElementById('su-password').value;
   if(!name){showAuthMsg('Please enter your name.','error');return;}
   if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showAuthMsg('Please enter a valid email.','error');return;}
-  if(password.length<6){showAuthMsg('Password must be at least 6 characters.','error');return;}
+  const pwdValid=/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+  if(!pwdValid){showAuthMsg('Password must be 8+ characters with uppercase, lowercase, number and symbol (e.g. Abc123!).','error');return;}
   showAuthMsg('Creating your account…','success');
   try{
     const r=await supaXHR('/auth/v1/signup','POST',{email,password,data:{name,age_group:selectedAge}});
@@ -2524,30 +2526,31 @@ function renderProfile(){
 
 
 function checkPwdStrength(pwd){
-  // Update reset screen strength bar if active
-  const resetFill=document.getElementById('pwd-fill-reset');
-  const resetLabel=document.getElementById('pwd-label-reset');
   const fill=document.getElementById('pwd-fill');
   const label=document.getElementById('pwd-label');
-  if(!fill)return;
+  const resetFill=document.getElementById('pwd-fill-reset');
+  const resetLabel=document.getElementById('pwd-label-reset');
+  if(!fill&&!resetFill)return;
+  // Score based on new requirements: 8+ chars, uppercase, lowercase, number, symbol
   let score=0;
-  if(pwd.length>=6)score++;
-  if(pwd.length>=10)score++;
+  if(pwd.length>=8)score++;
+  if(/[a-z]/.test(pwd))score++;
   if(/[A-Z]/.test(pwd))score++;
   if(/[0-9]/.test(pwd))score++;
   if(/[^A-Za-z0-9]/.test(pwd))score++;
   const levels=[
-    {w:'0%',c:'transparent',t:''},
-    {w:'25%',c:'#f87171',t:'Weak'},
-    {w:'50%',c:'#fb923c',t:'Fair'},
-    {w:'75%',c:'#facc15',t:'Good'},
-    {w:'100%',c:'#34d399',t:'Strong'}
+    {w:'0%',c:'transparent',t:'Enter a password'},
+    {w:'25%',c:'#f87171',t:'Too weak'},
+    {w:'50%',c:'#fb923c',t:'Needs uppercase, number & symbol'},
+    {w:'75%',c:'#facc15',t:'Almost there — add a symbol'},
+    {w:'90%',c:'#86efac',t:'Good — add a symbol or number'},
+    {w:'100%',c:'#34d399',t:'Strong ✓'}
   ];
-  const l=levels[Math.min(score,4)];
-  fill.style.width=l.w;
-  fill.style.background=l.c;
-  label.textContent=l.t;
-  label.style.color=l.c;
+  const l=levels[Math.min(score,5)];
+  if(fill){fill.style.width=l.w;fill.style.background=l.c;}
+  if(label){label.textContent=l.t;label.style.color=l.c;}
+  if(resetFill){resetFill.style.width=l.w;resetFill.style.background=l.c;}
+  if(resetLabel){resetLabel.textContent=l.t;resetLabel.style.color=l.c;}
 }
 
 async function doForgotPassword(){
